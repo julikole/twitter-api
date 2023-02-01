@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const app = express();
-const { getTweets, getTweetsByUserName } = require('./services/database')
+const { getTweets, getTweetsByUserName, createTweet } = require('./services/database')
 
 app.use(cors()); // can make fetch requests from anywhere
 app.use(express.json()); // convert to json
@@ -24,6 +24,21 @@ app.get('/tweets/:username', async (req, res) => {
     const tweets = await getTweetsByUserName(username);
     res.json(tweets);
 });
+
+//get tweets by id
+// app.get('/tweets/:id', async (req, res) => {
+//     const { id } = req.params;
+//     const tweets = await getTweetsById(id);
+//     res.json(tweets);
+// });
+
+app.post('/tweets', async (req, res) => {
+    const { text } = req.body;
+    const username  = req.headers['x-user'];
+    const newTweet = await createTweet(text, username);
+    res.json(newTweet);
+})
+
 
 app.listen(PORT, () => {
     console.log(`Twitter API listening to port ${PORT}`)
