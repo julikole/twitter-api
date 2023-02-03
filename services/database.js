@@ -1,11 +1,9 @@
 const { Pool } = require('pg');
 
+const POSTGRES_URL = process.env.POSTGRES_URL || 'postgresql://postgres:@localhost:5432/twitter';
+
 const database = new Pool({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'Twitter',
-    password: 'Fornebu2020%',
-    port: 5432,
+    connectionString: POSTGRES_URL
 });
 
 async function getTweets() {
@@ -46,28 +44,6 @@ async function getTweetsByUserName(username) {
     return result.rows;
 
 }
-
-
-// get tweets by id
-
-// async function getTweetsById(id) {
-//     const result = await database.query(`
-//     SELECT
-//         tweets.id,
-//         tweets.message,
-//         tweets.created_at,
-//         users.name,
-//         users.username
-//     FROM
-//         tweets
-//     INNER JOIN users ON
-//         tweets.user_id = users.id
-    
-// `);
-
-//     return result.id;
-
-// }
 
 
 async function createTweet(text, username) {
