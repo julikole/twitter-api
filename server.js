@@ -7,7 +7,7 @@ const { getTweets, getTweetsByUserName, createTweet, getUserByUserName } = requi
 app.use(cors()); // can make fetch requests from anywhere
 app.use(express.json()); // convert to json
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const APP_SECRET = 'my-secret-key-1234';
 
 app.get('/', (req, res) => {
@@ -36,10 +36,19 @@ app.get('/tweets/:username', async (req, res) => {
 
 app.post('/tweets', async (req, res) => {
     const { text } = req.body;
-    const username = req.headers['x-user'];
-    const newTweet = await createTweet(text, username);
-    res.json(newTweet);
-})
+    const token = req.headers['x-token'];
+    
+    try {
+        const payload = jwt.verify(token, Buffer.from(APP_SECRET, 'base64'));
+        const username = payload.username;
+        const newTweet = await createTweet(text, username);
+        res.json(newTweet);    
+    } catch (error) {
+        res.status(401).send({
+            error: 'Unable to verify token - not able to tweet'
+        });
+    }
+});
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
